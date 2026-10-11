@@ -3,7 +3,7 @@ import {
 } from "react-router-dom";
 
 
-function LeftSidebar() {
+function LeftSidebar({ activeCommunity, setActiveCommunity }){
 
   const communities = [
     "programming",
@@ -47,6 +47,7 @@ function LeftSidebar() {
           to="/"
           end
           className={getMenuClass}
+          onClick={() => setActiveCommunity("")}
         >
 
           <span className="menu-icon">
@@ -163,14 +164,14 @@ function LeftSidebar() {
 
       <div className="community-menu">
 
-
         {communities.map(
           (community) => (
 
             <button
               type="button"
-              className="community-item"
+              className={activeCommunity === community ? "community-item active" : "community-item"}
               key={community}
+              onClick={() => setActiveCommunity(community)}
             >
 
               <span className="community-circle">

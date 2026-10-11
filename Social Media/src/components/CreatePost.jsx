@@ -13,6 +13,7 @@ function CreatePost() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [community, setCommunity] = useState("g/general"); // New community tagging feature
   const [loading, setLoading] = useState(false);
 
 
@@ -31,6 +32,7 @@ function CreatePost() {
   const handleCancel = () => {
     setTitle("");
     setContent("");
+    setCommunity("g/general"); // New community tagging feature
     setShowForm(false);
   };
 
@@ -60,6 +62,8 @@ function CreatePost() {
 
           content: content.trim(),
 
+          community: community, // New community tagging feature
+
           userId: user.uid,
 
           username:
@@ -77,6 +81,7 @@ function CreatePost() {
 
       setTitle("");
       setContent("");
+      setCommunity("g/general"); // New community tagging feature
       setShowForm(false);
 
     } catch (error) {
@@ -146,6 +151,22 @@ function CreatePost() {
           </button>
 
         </div>
+
+        {/* New community tagging feature */}
+        <select
+          className="create-post-community"
+          value={community}
+          onChange={(event) => setCommunity(event.target.value)}
+          disabled={loading}
+          style={{ marginBottom: "15px", padding: "10px", backgroundColor: "#1A2837", color: "white", border: "1px solid #2D3A4A", borderRadius: "5px", width: "100%", outline: "none" }}
+        >
+          <option value="g/general">g/general</option>
+          <option value="g/programming">g/programming</option>
+          <option value="g/gaming">g/gaming</option>
+          <option value="g/technology">g/technology</option>
+          <option value="g/fitness">g/fitness</option>
+          <option value="g/movies">g/movies</option>
+        </select>
 
 
         <input

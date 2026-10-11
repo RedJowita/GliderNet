@@ -34,6 +34,10 @@ function Home() {
   const [searchText, setSearchText] =
     useState("");
 
+  // ADDED: Memory for which community is clicked
+  const [activeCommunity, setActiveCommunity] = 
+    useState("");
+
 
   // ==================================
   // LOAD POSTS FROM FIRESTORE
@@ -135,9 +139,12 @@ function Home() {
     posts.filter(
       (post) => {
 
-        // If search is empty,
-        // show every post.
+        // ADDED: If a community is selected, filter out posts that don't match
+        if (activeCommunity && post.community !== `g/${activeCommunity}`) {
+          return false;
+        }
 
+        // If search is empty, show every post (that passed the community check).
         if (!normalizedSearch) {
           return true;
         }
@@ -206,7 +213,10 @@ function Home() {
 
         {/* LEFT SIDEBAR */}
 
-        <LeftSidebar />
+        <LeftSidebar 
+          activeCommunity={activeCommunity} 
+          setActiveCommunity={setActiveCommunity} 
+        />
 
 
         {/* MAIN FEED */}
@@ -220,11 +230,7 @@ function Home() {
           <div className="feed-heading">
 
             <h2>
-
-              {normalizedSearch
-                ? "Search Results"
-                : "Home"}
-
+              {activeCommunity ? "g/" + activeCommunity : (normalizedSearch ? "Search Results" : "Home")}
             </h2>
 
 

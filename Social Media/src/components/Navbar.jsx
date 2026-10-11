@@ -158,6 +158,13 @@ function Navbar({
       behavior: "smooth"
     });
 
+    
+    // Tell the browser to virtually click the create post box
+    setTimeout(() => {
+      const createBox = document.querySelector('.create-post-placeholder');
+      if (createBox) createBox.click();
+    }, 100);
+
   };
 
 
@@ -178,6 +185,28 @@ function Navbar({
 
     };
 
+  // ==================================
+  // LOGO CLICK 
+  // ==================================
+  
+  const handleLogoClick = (event) => {
+    event.preventDefault();
+    
+    // 1. Clear any active search
+    if (setSearchText) {
+      setSearchText("");
+    }
+    
+    // 2. Navigate home (if on another page)
+    navigate("/");
+    
+    // 3. Scroll to the top
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
 
   // ==================================
   // PAGE
@@ -193,6 +222,7 @@ function Navbar({
       <Link
         to="/"
         className="brand"
+        onClick={handleLogoClick}
       >
 
         <div className="brand-logo">

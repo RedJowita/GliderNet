@@ -670,24 +670,17 @@ function PostDetails() {
 
             <div>
 
-
-              <div className="post-community">
-
-                {post.username ||
-                  "Glide User"}
-
+              {/* ADDED: Show the community tag */}
+              <div className="post-community" style={{ fontWeight: "bold", color: "white" }}>
+                {post.community || "g/general"}
               </div>
 
 
+              {/* UPDATED: Show the username and time */}
               <div className="post-info">
-
-                Posted{" • "}
-
-                {post.time ||
-                  "Just now"}
-
+                Posted by {post.username || "Glide User"} {" • "}
+                {post.time || "Just now"}
               </div>
-
 
             </div>
 
