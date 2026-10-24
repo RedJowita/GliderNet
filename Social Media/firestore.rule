@@ -1,0 +1,122 @@
+rules_version = '2';
+
+service cloud.firestore {
+
+  match /databases/{database}/documents {
+
+
+    // ========================================
+    // POSTS
+    // ========================================
+
+    match /posts/{postId} {
+
+      // Anyone can read posts
+      allow read: if true;
+
+
+      // Logged-in users can create posts,
+      // but the userId must be their own UID.
+      allow create:
+        if request.auth != null
+        && request.resource.data.userId
+           == request.auth.uid;
+
+
+      // Logged-in users may update ONLY
+      // votes and comments counters.
+      allow update:
+        if request.auth != null
+        && request.resource.data
+             .diff(resource.data)
+             .affectedKeys()
+             .hasOnly([
+               'votes',
+               'comments'
+             ]);
+
+
+      // Only the post owner can delete it.
+      allow delete:
+        if request.auth != null
+        && resource.data.userId
+           == request.auth.uid;
+
+
+
+      // ========================================
+      // VOTES
+      // ========================================
+
+      match /votes/{userId} {
+
+        allow read: if true;
+
+
+        // A user can only create/update/delete
+        // their own vote document.
+        allow create, update, delete:
+          if request.auth != null
+          && request.auth.uid
+             == userId;
+
+      }
+
+
+
+      // ========================================
+      // COMMENTS
+      // ========================================
+
+      match /comments/{commentId} {
+
+        allow read: if true;
+
+
+        // User ID inside a new comment
+        // must match the logged-in user.
+        allow create:
+          if request.auth != null
+          && request.resource.data.userId
+             == request.auth.uid;
+
+
+        // Only comment owner can modify/delete.
+        allow update, delete:
+          if request.auth != null
+          && resource.data.userId
+             == request.auth.uid;
+
+      }
+
+    }
+
+
+
+    // ========================================
+    // USERS
+    // ========================================
+
+    match /users/{userId} {
+
+
+      // ========================================
+      // SAVED POSTS
+      // ========================================
+
+      match /savedPosts/{postId} {
+
+        // Only this user can see or modify
+        // their saved posts.
+        allow read, create, update, delete:
+          if request.auth != null
+          && request.auth.uid
+             == userId;
+
+      }
+
+    }
+
+  }
+
+}
