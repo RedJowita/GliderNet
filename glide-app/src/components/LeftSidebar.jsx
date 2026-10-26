@@ -84,6 +84,11 @@ function LeftSidebar({ activeCommunity, setActiveCommunity }) {
             <span>All</span>
           </NavLink>
 
+          <NavLink to="/friends" className={getMenuClass}>
+            <span className="menu-icon">👥</span>
+            <span>Friends</span>
+          </NavLink>
+
           <NavLink to="/my-communities" className={getMenuClass}>
             <span className="menu-icon">♙</span>
             <span>My Communities</span>

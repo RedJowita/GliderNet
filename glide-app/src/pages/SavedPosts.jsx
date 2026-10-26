@@ -25,6 +25,7 @@ import Navbar from "../components/Navbar";
 import LeftSidebar from "../components/LeftSidebar";
 import Post from "../components/Post";
 import RightSidebar from "../components/RightSidebar";
+import UserProfileModal from "../components/UserProfileModal";
 
 
 function SavedPosts() {
@@ -40,6 +41,9 @@ function SavedPosts() {
 
   const [loadingPosts, setLoadingPosts] =
     useState(true);
+
+  const [selectedProfile, setSelectedProfile] = 
+    useState(null);
 
 
   // ==================================
@@ -388,6 +392,7 @@ function SavedPosts() {
                       post={
                         post
                       }
+                      onUserClick={(userObj) => setSelectedProfile(userObj)}
                     />
 
                   )
@@ -406,6 +411,13 @@ function SavedPosts() {
 
       </main>
 
+      {selectedProfile && (
+        <UserProfileModal 
+          selectedUser={selectedProfile}
+          currentUser={user}
+          onClose={() => setSelectedProfile(null)}
+        />
+      )}
 
     </div>
 

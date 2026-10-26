@@ -26,7 +26,7 @@ import {
 } from "../firebase";
 
 
-function Post({ post }) {
+function Post({ post, onUserClick }) {
 
   const navigate = useNavigate();
 
@@ -664,7 +664,23 @@ function Post({ post }) {
 
           {/* Show the username and time */}
           <div className="post-info">
-            Posted by {post.username || "Glide User"} {" • "}
+            Posted by{" "}
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onUserClick && post.userId) {
+                  onUserClick({
+                    id: post.userId,
+                    name: post.username || "Glide User"
+                  });
+                }
+              }}
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+              title={`View ${post.username || "User"}'s profile`}
+            >
+              {post.username || "Glide User"}
+            </span>
+            {" • "}
             {post.time || "Just now"}
           </div>
 

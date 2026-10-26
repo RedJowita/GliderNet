@@ -10,13 +10,18 @@ import {
   query
 } from "firebase/firestore";
 
-import { db } from "../firebase";
+import {
+  onAuthStateChanged
+} from "firebase/auth";
+
+import { db, auth } from "../firebase";
 
 import Navbar from "../components/Navbar";
 import LeftSidebar from "../components/LeftSidebar";
 import CreatePost from "../components/CreatePost";
 import Post from "../components/Post";
 import RightSidebar from "../components/RightSidebar";
+import UserProfileModal from "../components/UserProfileModal";
 
 
 function Home() {
@@ -37,6 +42,26 @@ function Home() {
   // Memory for which community is clicked
   const [activeCommunity, setActiveCommunity] = 
     useState("");
+
+  // Current logged in user (needed for the friend request)
+  const [currentUser, setCurrentUser] = 
+    useState(null);
+
+  // The user profile currently being viewed in the popup
+  const [selectedProfile, setSelectedProfile] = 
+    useState(null);
+
+
+  // ==================================
+  // AUTH STATE
+  // ==================================
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
 
   // ==================================
@@ -329,6 +354,8 @@ function Home() {
                     post={
                       post
                     }
+                    // Pass the click handler down to the Post component
+                    onUserClick={(userObj) => setSelectedProfile(userObj)}
                   />
 
                 )
@@ -347,6 +374,15 @@ function Home() {
 
 
       </main>
+
+      {/* USER PROFILE MODAL */}
+      {selectedProfile && (
+        <UserProfileModal 
+          selectedUser={selectedProfile}
+          currentUser={currentUser}
+          onClose={() => setSelectedProfile(null)}
+        />
+      )}
 
 
     </div>

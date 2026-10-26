@@ -10,12 +10,17 @@ import {
   query
 } from "firebase/firestore";
 
-import { db } from "../firebase";
+import {
+  onAuthStateChanged
+} from "firebase/auth";
+
+import { auth, db } from "../firebase";
 
 import Navbar from "../components/Navbar";
 import LeftSidebar from "../components/LeftSidebar";
 import Post from "../components/Post";
 import RightSidebar from "../components/RightSidebar";
+import UserProfileModal from "../components/UserProfileModal";
 
 
 function Popular() {
@@ -28,6 +33,17 @@ function Popular() {
 
   const [searchText, setSearchText] =
     useState("");
+
+  const [currentUser, setCurrentUser] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
 
   useEffect(() => {
@@ -226,6 +242,7 @@ function Popular() {
                   <Post
                     key={post.id}
                     post={post}
+                    onUserClick={(userObj) => setSelectedProfile(userObj)}
                   />
 
                 )
@@ -239,6 +256,14 @@ function Popular() {
         <RightSidebar />
 
       </main>
+
+      {selectedProfile && (
+        <UserProfileModal 
+          selectedUser={selectedProfile}
+          currentUser={currentUser}
+          onClose={() => setSelectedProfile(null)}
+        />
+      )}
 
     </div>
 

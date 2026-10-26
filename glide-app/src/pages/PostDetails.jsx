@@ -29,6 +29,8 @@ import {
   db
 } from "../firebase";
 
+import UserProfileModal from "../components/UserProfileModal";
+
 
 function PostDetails() {
 
@@ -56,6 +58,9 @@ function PostDetails() {
     useState(null);
 
   const [deletingCommentId, setDeletingCommentId] =
+    useState(null);
+
+  const [selectedProfile, setSelectedProfile] = 
     useState(null);
 
 
@@ -678,7 +683,23 @@ function PostDetails() {
 
               {/* UPDATED: Show the username and time */}
               <div className="post-info">
-                Posted by {post.username || "Glide User"} {" • "}
+                Posted by{" "}
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (post.userId) {
+                      setSelectedProfile({
+                        id: post.userId,
+                        name: post.username || "Glide User"
+                      });
+                    }
+                  }}
+                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                  title={`View ${post.username || "User"}'s profile`}
+                >
+                  {post.username || "Glide User"}
+                </span>
+                {" • "}
                 {post.time || "Just now"}
               </div>
 
@@ -887,7 +908,19 @@ function PostDetails() {
 
                         <div className="comment-user-info">
 
-                          <strong>
+                          <strong
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (comment.userId) {
+                                setSelectedProfile({
+                                  id: comment.userId,
+                                  name: comment.username || "Glide User"
+                                });
+                              }
+                            }}
+                            style={{ cursor: "pointer", textDecoration: "underline" }}
+                            title={`View ${comment.username || "User"}'s profile`}
+                          >
 
                             {comment.username ||
                               "Glide User"}
@@ -960,6 +993,13 @@ function PostDetails() {
 
       </div>
 
+      {selectedProfile && (
+        <UserProfileModal 
+          selectedUser={selectedProfile}
+          currentUser={user}
+          onClose={() => setSelectedProfile(null)}
+        />
+      )}
 
     </div>
 

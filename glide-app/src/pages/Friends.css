@@ -1,0 +1,165 @@
+/* ========================================
+   FRIENDS HUB (DARK MODE)
+======================================== */
+.friends-page-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr) 300px;
+  gap: 24px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.friends-container {
+  background: #0a1624;
+  border: 1px solid #20344b;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 80vh;
+}
+
+.friends-header {
+  padding: 20px;
+  border-bottom: 1px solid #20344b;
+}
+
+.friends-header h2 {
+  margin: 0 0 16px 0;
+  color: white;
+}
+
+.friends-tabs {
+  display: flex;
+  gap: 16px;
+}
+
+.friend-tab-btn {
+  background: transparent;
+  border: none;
+  color: #71869e;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.friend-tab-btn.active {
+  color: #1689ff;
+  border-bottom: 2px solid #1689ff;
+}
+
+.friend-tab-btn:hover:not(.active) {
+  color: #dce8f6;
+}
+
+.friends-content {
+  padding: 20px;
+}
+
+.friend-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #0d1b2b;
+  border: 1px solid #20344b;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.friend-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.friend-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1689ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.friend-name {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.friend-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-accept, .btn-message {
+  background: #1689ff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-accept:hover, .btn-message:hover {
+  background: #0878e8;
+}
+
+.btn-decline {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-decline:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+======================================== */
+body.light-mode .friends-container {
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+body.light-mode .friends-header {
+  border-bottom-color: #e5e7eb !important;
+}
+
+body.light-mode .friends-header h2 {
+  color: #111827 !important;
+}
+
+body.light-mode .friend-card {
+  background: #f9fafb !important;
+  border-color: #e5e7eb !important;
+}
+
+body.light-mode .friend-name {
+  color: #111827 !important;
+}
+
+@media (max-width: 1000px) {
+  .friends-page-layout {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .friends-page-layout {
+    grid-template-columns: 1fr;
+  }
+}

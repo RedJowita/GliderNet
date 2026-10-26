@@ -14,6 +14,7 @@ import AllPosts from "./pages/AllPosts";
 import MyCommunities from "./pages/MyCommunities";
 import Settings from "./pages/Settings";
 import DirectMessages from "./pages/DirectMessages";
+import Friends from "./pages/Friends";
 
 import "./App.css";
 
@@ -94,6 +95,14 @@ function App() {
         <Route
           path="/messages"
           element={<DirectMessages />}
+        />
+
+
+
+        {/* FRIENDS */}
+        <Route
+          path="/friends"
+          element={<Friends />}
         />
 
       </Routes>
