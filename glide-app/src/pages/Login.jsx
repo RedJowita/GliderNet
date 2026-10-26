@@ -9,7 +9,14 @@ import {
   signInWithEmailAndPassword
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "firebase/firestore";
+
+import { auth, db } from "../firebase";
 
 function Login() {
   const [email, setEmail] =
@@ -37,11 +44,29 @@ function Login() {
     try {
       setLoading(true);
 
-      await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password
-      );
+      const userCredential =
+        await signInWithEmailAndPassword(
+          auth,
+          email.trim(),
+          password
+        );
+
+      const user = userCredential.user;
+
+      // check if user document exists in Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      // if it doesnt exist like older test accounts, create the document
+      if (!userSnap.exists()) {
+        const defaultUsername = email.split("@")[0]; // fallback to email prefix
+        await setDoc(userRef, {
+          username: defaultUsername,
+          displayName: defaultUsername,
+          email: email.trim(),
+          createdAt: serverTimestamp()
+        });
+      }
 
       navigate("/");
 
