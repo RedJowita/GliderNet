@@ -1,0 +1,265 @@
+/* ========================================
+   DIRECT MESSAGES - BASE (DARK MODE)
+======================================== */
+
+.dm-page-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 24px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.dm-container {
+  display: flex;
+  height: calc(100vh - 120px);
+  background: #0d1b2b;
+  border: 1px solid #20344b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* --- DM SIDEBAR (CONTACTS) --- */
+.dm-sidebar {
+  width: 320px;
+  border-right: 1px solid #20344b;
+  display: flex;
+  flex-direction: column;
+  background: #0a1624;
+}
+
+.dm-sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #20344b;
+}
+
+.dm-sidebar-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+}
+
+.dm-contact-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dm-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  border-bottom: 1px solid #172b40;
+}
+
+.dm-contact-item:hover, .dm-contact-item.active {
+  background: #101f31;
+}
+
+.dm-contact-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #1689ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.dm-contact-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dm-contact-name {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dm-contact-preview {
+  color: #71869e;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 3px;
+}
+
+/* --- DM CHAT AREA --- */
+.dm-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0d1b2b;
+}
+
+.dm-chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #20344b;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dm-chat-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 16px;
+}
+
+.dm-messages {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dm-message-bubble {
+  max-width: 65%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dm-message-received {
+  align-self: flex-start;
+  background: #1a2837;
+  color: #dce8f6;
+  border-bottom-left-radius: 4px;
+}
+
+.dm-message-sent {
+  align-self: flex-end;
+  background: #1689ff;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.dm-input-area {
+  padding: 20px;
+  border-top: 1px solid #20344b;
+  display: flex;
+  gap: 12px;
+}
+
+.dm-input-area input {
+  flex: 1;
+  height: 44px;
+  padding: 0 16px;
+  background: #101f31;
+  border: 1px solid #263d56;
+  border-radius: 22px;
+  color: white;
+  outline: none;
+  font-size: 14px;
+}
+
+.dm-input-area input:focus {
+  border-color: #1689ff;
+}
+
+.dm-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1689ff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.dm-send-btn:hover {
+  background: #0878e8;
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+======================================== */
+
+body.light-mode .dm-container {
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+body.light-mode .dm-sidebar {
+  background: #f9fafb !important;
+  border-right-color: #e5e7eb !important;
+}
+
+body.light-mode .dm-sidebar-header,
+body.light-mode .dm-chat-header,
+body.light-mode .dm-input-area {
+  border-color: #e5e7eb !important;
+}
+
+body.light-mode .dm-contact-item {
+  border-bottom-color: #f3f4f6 !important;
+}
+
+body.light-mode .dm-contact-item:hover,
+body.light-mode .dm-contact-item.active {
+  background: #e5e7eb !important;
+}
+
+body.light-mode .dm-sidebar-header h2,
+body.light-mode .dm-contact-name,
+body.light-mode .dm-chat-header h3 {
+  color: #111827 !important;
+}
+
+body.light-mode .dm-contact-preview {
+  color: #6b7280 !important;
+}
+
+body.light-mode .dm-chat-area {
+  background: #ffffff !important;
+}
+
+body.light-mode .dm-message-received {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+body.light-mode .dm-input-area input {
+  background: #f9fafb !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+body.light-mode .dm-input-area input::placeholder {
+  color: #9ca3af !important;
+}
+
+@media (max-width: 1150px) {
+  .dm-page-layout {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 850px) {
+  .dm-page-layout {
+    display: block;
+  }
+  .dm-sidebar {
+    width: 100px;
+  }
+  .dm-contact-info {
+    display: none;
+  }
+}
