@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, orderBy, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 import Navbar from "../components/Navbar";
 import LeftSidebar from "../components/LeftSidebar";
@@ -11,17 +12,13 @@ import "./DirectMessages.css";
 
 function DirectMessages() {
   const [user, setUser] = useState(null);
+  const [contacts, setContacts] = useState([]);
+  const [activeChat, setActiveChat] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const navigate = useNavigate();
 
-  // Mock data for UI layout - you can replace this with Firestore queries later
-  const [activeChat, setActiveChat] = useState(1);
-  const contacts = [
-    { id: 1, name: "thelarpingman", preview: "Yeah that bug was annoying...", initial: "T" },
-    { id: 2, name: "ggwp_dude", preview: "Are we still playing tonight?", initial: "G" },
-    { id: 3, name: "glide_admin", preview: "Welcome to your new account!", initial: "G" }
-  ];
-
+  // check auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -33,11 +30,88 @@ function DirectMessages() {
     return () => unsubscribe();
   }, [navigate]);
 
+  // fetch active friends for contacts list
+  useEffect(() => {
+    if (!user) return;
+
+    const friendsQuery = query(
+      collection(db, "friendships"),
+      where("status", "==", "accepted")
+    );
+
+    const unsubscribe = onSnapshot(friendsQuery, async (snapshot) => {
+      const friendPromises = snapshot.docs.map(async (friendDoc) => {
+        const data = friendDoc.data();
+
+        if (data.senderId === user.uid || data.receiverId === user.uid) {
+          const friendId = data.senderId === user.uid ? data.receiverId : data.senderId;
+
+          const userRef = doc(db, "users", friendId);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.exists() ? userSnap.data() : {};
+          const name = userData.username || userData.displayName || "Glide User";
+
+          return {
+            id: friendId,
+            name: name,
+            preview: "Click to chat",
+            initial: name.charAt(0).toUpperCase()
+          };
+        }
+        return null;
+      });
+
+      const resolvedFriends = (await Promise.all(friendPromises)).filter(f => f !== null);
+      setContacts(resolvedFriends);
+
+      if (resolvedFriends.length > 0 && !activeChat) {
+        setActiveChat(resolvedFriends[0].id);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user, activeChat]);
+
+  // get messages from firebase
+  useEffect(() => {
+    if (!user || !activeChat) return;
+
+    const messagesQuery = query(
+      collection(db, "messages"),
+      orderBy("timestamp", "asc")
+    );
+
+    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+      const allMessages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        item: doc.data(),
+        time: doc.data().timestamp?.toDate().toLocaleString() || "Just now"
+      }));
+
+      // filter messages between current user and activeChat friend
+      const chatMessages = allMessages.filter(
+        (msg) =>
+          (msg.item.senderId === user.uid && msg.item.receiverId === activeChat) ||
+          (msg.item.senderId === activeChat && msg.item.receiverId === user.uid)
+      );
+
+      setMessages(chatMessages);
+    });
+
+    return () => unsubscribe();
+  }, [user, activeChat]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!messageText.trim()) return;
-    // Add Firestore push logic here later
-    console.log("Sending:", messageText);
+    if (!messageText.trim() || !activeChat) return;
+
+    addDoc(collection(db, "messages"), {
+      senderId: user.uid,
+      receiverId: activeChat,
+      text: messageText.trim(),
+      timestamp: serverTimestamp()
+    });
+
     setMessageText("");
   };
 
@@ -84,16 +158,15 @@ function DirectMessages() {
             </div>
 
             <div className="dm-messages">
-              {/* Dummy conversation layout */}
-              <div className="dm-message-bubble dm-message-received">
-                Hey, did you manage to fix that CSS bug in light mode?
-              </div>
-              <div className="dm-message-bubble dm-message-sent">
-                Yeah, just added a separate CSS file for it. Looks super clean now.
-              </div>
-              <div className="dm-message-bubble dm-message-received">
-                Awesome! Let me see a screenshot when you're done.
-              </div>
+              {messages.map((msg) => (
+                <div 
+                  key={msg.id} 
+                  className={`dm-message-bubble ${msg.item.senderId === user.uid ? "dm-message-sent" : "dm-message-received"}`}
+                >
+                  <div>{msg.item.text}</div>
+                  <div className="dm-message-time">{msg.time}</div>
+                </div>
+              ))}
             </div>
 
             <form className="dm-input-area" onSubmit={handleSendMessage}>

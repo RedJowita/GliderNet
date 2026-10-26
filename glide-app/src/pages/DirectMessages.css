@@ -263,3 +263,24 @@ body.light-mode .dm-input-area input::placeholder {
     display: none;
   }
 }
+
+
+/* for DM message's time */ 
+.dm-message-time {
+  font-size: 10px;
+  color: #71869e;
+  margin-top: 4px;
+  text-align: right;
+}
+
+.dm-message-sent .dm-message-time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+body.light-mode .dm-message-time {
+  color: #6b7280;
+}
+
+body.light-mode .dm-message-sent .dm-message-time {
+  color: rgba(255, 255, 255, 0.8);
+}
