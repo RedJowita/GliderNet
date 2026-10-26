@@ -10,7 +10,16 @@ import {
   signOut
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import {
+  doc,
+  setDoc,
+  serverTimestamp
+} from "firebase/firestore";
+
+import { 
+  auth, 
+  db 
+} from "../firebase";
 
 function Register() {
   const [username, setUsername] =
@@ -71,6 +80,21 @@ function Register() {
         userCredential.user,
         {
           displayName: username.trim()
+        }
+      );
+
+      // create the user document in Firestore so their profile data exists
+      await setDoc(
+        doc(
+          db, 
+          "users", 
+          userCredential.user.uid
+        ), 
+        {
+          username: username.trim(),
+          displayName: username.trim(),
+          email: email.trim(),
+          createdAt: serverTimestamp()
         }
       );
 

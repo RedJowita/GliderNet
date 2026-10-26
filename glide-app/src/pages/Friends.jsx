@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 import Navbar from "../components/Navbar";
@@ -18,7 +18,7 @@ function Friends() {
   
   const navigate = useNavigate();
 
-  // 1. Check Auth State
+  // check auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -30,7 +30,7 @@ function Friends() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // 2. Fetch Incoming Requests
+  // fetch incoming request and user detail
   useEffect(() => {
     if (!user) return;
 
@@ -40,42 +40,70 @@ function Friends() {
       where("status", "==", "pending")
     );
 
-    const unsubscribe = onSnapshot(requestsQuery, (snapshot) => {
-      const requestsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setIncomingRequests(requestsData);
+    const unsubscribe = onSnapshot(requestsQuery, async (snapshot) => {
+      // fetch the actual user profiles for the sender IDs
+      const requestsPromises = snapshot.docs.map(async (requestDoc) => {
+        const data = requestDoc.data();
+        
+        // grabs the sender's profile from the users collection
+        const userRef = doc(db, "users", data.senderId);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.exists() ? userSnap.data() : {};
+
+        return {
+          id: requestDoc.id,
+          ...data,
+          // fallback through username -> display name -> generic
+          senderName: userData.username || userData.displayName || "Glide User" 
+        };
+      });
+
+      // wait for all profiles to load before setting state
+      const resolvedRequests = await Promise.all(requestsPromises);
+      setIncomingRequests(resolvedRequests);
     });
 
     return () => unsubscribe();
   }, [user]);
 
-  // 3. Fetch Active Friends
+  // fetch active friends and User's detail
   useEffect(() => {
     if (!user) return;
 
-    // Listen to all accepted friendships
+    // listen to all accepted friendships
     const friendsQuery = query(
       collection(db, "friendships"),
       where("status", "==", "accepted")
     );
 
-    const unsubscribe = onSnapshot(friendsQuery, (snapshot) => {
-      const friendsData = [];
-      snapshot.docs.forEach((doc) => {
-        const data = doc.data();
-        // Only keep it if the current user is part of the accepted relationship
+    const unsubscribe = onSnapshot(friendsQuery, async (snapshot) => {
+      const friendPromises = snapshot.docs.map(async (friendDoc) => {
+        const data = friendDoc.data();
+        
+        //keeps it if the current user is part of the accepted relationship
         if (data.senderId === user.uid || data.receiverId === user.uid) {
-          friendsData.push({
-            id: doc.id,
-            // Figure out the OTHER person's ID
-            friendId: data.senderId === user.uid ? data.receiverId : data.senderId,
-            ...data
-          });
+          
+          // figure out the OTHER person's ID
+          const friendId = data.senderId === user.uid ? data.receiverId : data.senderId;
+          
+          // fetch the friend's profile from the users collection
+          const userRef = doc(db, "users", friendId);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.exists() ? userSnap.data() : {};
+
+          return {
+            id: friendDoc.id,
+            friendId,
+            ...data,
+            friendName: userData.username || userData.displayName || "Glide User"
+          };
         }
+        return null;
       });
-      setFriendsList(friendsData);
+
+      // this will filter out any nulls (friendships you aren't part of) and set state
+      const resolvedFriends = (await Promise.all(friendPromises)).filter(f => f !== null);
+      setFriendsList(resolvedFriends);
     });
 
     return () => unsubscribe();
@@ -140,9 +168,10 @@ function Friends() {
                   incomingRequests.map(request => (
                     <div className="friend-card" key={request.id}>
                       <div className="friend-info">
-                        <div className="friend-avatar">U</div>
-                        {/* We use a snippet of their ID here for now until we link user profiles! */}
-                        <h3 className="friend-name">User: {request.senderId.substring(0, 5)}...</h3>
+                        <div className="friend-avatar">
+                          {request.senderName.charAt(0).toUpperCase()}
+                        </div>
+                        <h3 className="friend-name">{request.senderName}</h3>
                       </div>
                       <div className="friend-actions">
                         <button className="btn-accept" onClick={() => handleAccept(request.id)}>Accept</button>
@@ -163,8 +192,10 @@ function Friends() {
                   friendsList.map(friend => (
                     <div className="friend-card" key={friend.id}>
                       <div className="friend-info">
-                        <div className="friend-avatar">F</div>
-                        <h3 className="friend-name">Friend: {friend.friendId.substring(0, 5)}...</h3>
+                        <div className="friend-avatar">
+                          {friend.friendName.charAt(0).toUpperCase()}
+                        </div>
+                        <h3 className="friend-name">{friend.friendName}</h3>
                       </div>
                       <div className="friend-actions">
                         <button className="btn-message" onClick={() => navigate("/messages")}>Message</button>
