@@ -7,7 +7,6 @@ import { auth, db } from "../firebase";
 import Navbar from "../components/Navbar";
 import LeftSidebar from "../components/LeftSidebar";
 
-// Import isolated CSS
 import "./DirectMessages.css";
 
 function DirectMessages() {
